@@ -147,7 +147,7 @@ a {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  width: 100px;
+  width: 150px;
   margin: 0 auto;
 }
 .btn {
@@ -157,6 +157,6 @@ a {
 .btn__calc {
   width: 30px;
   height: 30px;
-  margin: 3px;
+  margin: 5px;
 }
 </style>
