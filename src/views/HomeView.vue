@@ -1,68 +1,129 @@
 <template>
   <div class="home">
-    <!--<img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>-->
-        <header>
-          <div class="title">My personal costs</div>
-        </header>
-        <main>
-      <PaymentsDisplay :items="paymentsList"/>
-      <AddPaymentForm @addNewPayment="addPaymentData" />
-    </main>
+    <div>
+      <header>
+        <h1 class="title">My personal costs</h1>
+      </header>
+      <formVisiabilityButton
+        :classBtn="'show'"
+        :show="show"
+        @changeVisiability="changeVisiability('show')"
+      >
+        Add new cost
+      </formVisiabilityButton>
+      <div v-show="show">
+        <formPaymentAdd />
+      </div>
+      <!-- <paymentsList
+        :payments="currentPageElements"
+        :currentPage="current"
+        :elementsOnPage="elementsOnPage"
+      /> -->
+      <paymentsList :payments="currentPageElements" />
+      <!-- <paginationModule
+        :current="current"
+        :length="getPaymentsList.length"
+        :elementsOnPage="elementsOnPage"
+        @changePage="changePage"
+      /> -->
+      <paginationModule
+        :current="current"
+        :length="12"
+        :elementsOnPage="elementsOnPage"
+        @changePage="changePage"
+      />
+      <br />
+      <div>
+        <formCategoryAdd />
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import PaymentsDisplay from "@/components/PaymentsDisplay.vue";
-import AddPaymentForm from "@/components/AddPaymentForm.vue";
+// @ is an alias to /src
+import paymentsList from "@/components/paymentsList.vue";
+import formVisiabilityButton from "@/components/formVisiabilityButton.vue";
+import formPaymentAdd from "@/components/formPaymentAdd.vue";
+import paginationModule from "@/components/MyPagination.vue";
+import formCategoryAdd from "@/components/formCategoryAdd.vue";
+import { mapMutations, mapGetters } from "vuex";
 export default {
-  name: 'HomeView',
+  name: "HomeView",
   components: {
-    PaymentsDisplay,
-    AddPaymentForm,
+    paymentsList,
+    formVisiabilityButton,
+    formPaymentAdd,
+    paginationModule,
+    formCategoryAdd,
   },
   data() {
     return {
-      paymentsList: [],
+      show: false,
+      current: 1,
+      elementsOnPage: 3,
     };
   },
-  methods: {
-    addPaymentData(data) {
-      this.paymentsList.push(data)
+  computed: {
+    ...mapGetters(["getPaymentsList"]),
+    currentPageElements() {
+      return this.getPaymentsList.slice(
+        this.elementsOnPage * (this.current - 1),
+        this.elementsOnPage * (this.current - 1) + this.elementsOnPage
+      );
     },
-    fetchData() {
-      return [
-        {
-          date: "05.05.2022",
-          category: "Food",
-          value: 150,
-        },
-        {
-          date: "08.05.2022",
-          category: "Transport",
-          value: 600,
-        },
-        {
-          date: "08.05.2022",
-          category: "Food",
-          value: 500,
-        },
-      ];
+  },
+  methods: {
+    ...mapMutations(["setPaymentsListData"]),
+    changePage(page) {
+      this.current = page;
+      /* here */
+      this.$store.dispatch("fetchData", page);
+    },
+    changeVisiability(el) {
+      this[el] = !this[el];
     },
   },
   created() {
-    this.paymentsList = this.fetchData()
-  },
-  mounted() {
+    /*here*/
+    this.$store.dispatch("fetchData", this.current);
   },
 };
 </script>
 
-
-
-<style lang="scss" scoped>
+<style lang="scss">
 .title {
-  font-size: 20px;
-  margin: 0 0 20px 0;
+  font-size: 44px;
+}
+.home {
+  display: flex;
+}
+.btn {
+  display: inline-block;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #212529;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  background-color: transparent;
+  border: 1px solid transparent;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  border-radius: 0.25rem;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  color: #fff;
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  margin-bottom: 20px;
+  span {
+    margin-left: 10px;
+    font-size: 16px;
+  }
 }
 </style>
