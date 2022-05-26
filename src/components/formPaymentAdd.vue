@@ -26,6 +26,16 @@
 import { mapMutations, mapGetters } from "vuex";
 export default {
   name: "formPaymentAdd",
+  props: {
+    categoryProp: {
+      type: String,
+      default: () => "",
+    },
+    valueProp: {
+      type: Number,
+      default: () => null,
+    },
+  },
   data() {
     return {
       category: "",
@@ -34,9 +44,15 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["getCategoryList"]),
+    ...mapGetters(["getCategoryList", "getDataLoaded", "getCategoriesLoaded"]),
     categoryList() {
       return this.getCategoryList;
+    },
+    categoriesLoaded() {
+      return this.getCategoriesLoaded;
+    },
+    paymentsLoaded() {
+      return this.getDataLoaded;
     },
     getCurrentDate() {
       const today = new Date();
@@ -72,8 +88,22 @@ export default {
       this.addDataToPaymentsList(data);
     },
   },
-  created() {
-    this.$store.dispatch("fetchCategoryList");
+  async created() {
+    if (!this.paymentsLoaded) {
+      await this.$store.dispatch("fetchData");
+    }
+    if (!this.categoriesLoaded) {
+      await this.$store.dispatch("fetchCategoryList");
+    }
+    if (this.categoryProp) {
+      this.category = this.categoryProp;
+    }
+    if (this.valueProp) {
+      this.value = this.valueProp;
+    }
+    if (this.categoryProp && this.valueProp) {
+      this.addPaymentData();
+    }
   },
 };
 </script>

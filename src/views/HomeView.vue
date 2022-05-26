@@ -14,21 +14,14 @@
       <div v-show="show">
         <formPaymentAdd />
       </div>
-      <!-- <paymentsList
+      <paymentsList
         :payments="currentPageElements"
         :currentPage="current"
         :elementsOnPage="elementsOnPage"
-      /> -->
-      <paymentsList :payments="currentPageElements" />
-      <!-- <paginationModule
-        :current="current"
-        :length="getPaymentsList.length"
-        :elementsOnPage="elementsOnPage"
-        @changePage="changePage"
-      /> -->
+      />
       <paginationModule
         :current="current"
-        :length="12"
+        :length="getPaymentsList.length"
         :elementsOnPage="elementsOnPage"
         @changePage="changePage"
       />
@@ -45,7 +38,7 @@
 import paymentsList from "@/components/paymentsList.vue";
 import formVisiabilityButton from "@/components/formVisiabilityButton.vue";
 import formPaymentAdd from "@/components/formPaymentAdd.vue";
-import paginationModule from "@/components/MyPagination.vue";
+import paginationModule from "@/components/paginationModule.vue";
 import formCategoryAdd from "@/components/formCategoryAdd.vue";
 import { mapMutations, mapGetters } from "vuex";
 export default {
@@ -65,7 +58,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["getPaymentsList"]),
+    ...mapGetters(["getPaymentsList", "getDataLoaded"]),
     currentPageElements() {
       return this.getPaymentsList.slice(
         this.elementsOnPage * (this.current - 1),
@@ -77,16 +70,15 @@ export default {
     ...mapMutations(["setPaymentsListData"]),
     changePage(page) {
       this.current = page;
-      /* here */
-      this.$store.dispatch("fetchData", page);
     },
     changeVisiability(el) {
       this[el] = !this[el];
     },
   },
-  created() {
-    /*here*/
-    this.$store.dispatch("fetchData", this.current);
+  async created() {
+    if (!this.getDataLoaded) {
+      await this.$store.dispatch("fetchData");
+    }
   },
 };
 </script>

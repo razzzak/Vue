@@ -11,8 +11,7 @@
       </thead>
       <tbody>
         <tr v-for="(payment, i) in payments" :key="i">
-          <!-- <td>{{ elNumber + i + 1 }}</td> -->
-          <td>{{ payment.id }}</td>
+          <td>{{ elNumber + i + 1 }}</td>
           <td>{{ payment.date }}</td>
           <td>{{ payment.category }}</td>
           <td>{{ payment.value }}</td>
@@ -32,21 +31,21 @@ export default {
       type: Array,
       default: () => [],
     },
-    /*     elementsOnPage: {
+    elementsOnPage: {
       type: Number,
     },
     currentPage: {
       type: Number,
-    }, */
+    },
   },
   computed: {
     ...mapGetters(["getFullPaymentValue"]),
-    /* elNumber() {
+    elNumber() {
       if (this.currentPage > 1) {
         return this.elementsOnPage * this.currentPage - this.elementsOnPage;
       }
       return 0;
-    }, */
+    },
     getFPV() {
       return this.getFullPaymentValue;
     },
