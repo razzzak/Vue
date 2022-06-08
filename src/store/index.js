@@ -7,7 +7,8 @@ export default new Vuex.Store({
   state: {
     paymentsList: [],
     categoryList: [],
-    paymentsListIds: [],
+    diagData: [],
+    diagLoaded: false,
     dataLoaded: false,
     categoriesLoaded: false,
   },
@@ -19,6 +20,7 @@ export default new Vuex.Store({
     },
     getDataLoaded: (state) => state.dataLoaded,
     getCategoriesLoaded: (state) => state.categoriesLoaded,
+    getDiagData: (state) => state.diagData,
   },
   mutations: {
     setDataLoaded(state, payload) {
@@ -27,23 +29,37 @@ export default new Vuex.Store({
     setCategoriesLoaded(state, payload) {
       state.categoriesLoaded = payload;
     },
+    setDiagLoaded(state, payload) {
+      state.diagLoaded = payload;
+    },
     setPaymentsListData(state, payload) {
       state.paymentsList = payload;
     },
     setCategories(state, payload) {
       state.categoryList = payload;
     },
+    setDiagData(state, payload) {
+      state.diagData = payload;
+    },
     addDataToPaymentsList(state, payload) {
       state.paymentsList.push(payload);
+    },
+    addDiagData(state, payload) {
+      let result = state.diagData.find(
+        (item) => item[0].toUpperCase() == payload.category.toUpperCase()
+      );
+      if (result != undefined) {
+        Vue.set(result, 1, result[1] + payload.value);
+      } else {
+        state.diagData.push([payload.category, payload.value]);
+      }
     },
     addDataToCategoryList(state, payload) {
       state.categoryList.push(payload);
     },
     removeDataFromPaymentsList(state, payload) {
-      console.log(state.paymentsList);
       let filtered = state.paymentsList.filter((item) => item !== payload);
       state.paymentsList = filtered;
-      console.log(state.paymentsList);
     },
     setPaymentData(state, payload) {
       state.paymentsList[payload.id - 1].category = payload.category;
@@ -52,7 +68,7 @@ export default new Vuex.Store({
   },
 
   actions: {
-    fetchData({ state, commit }) {
+    fetchData({ state, commit, dispatch }) {
       if (state.dataLoaded) {
         return;
       }
@@ -79,6 +95,7 @@ export default new Vuex.Store({
       }).then((res) => {
         commit("setPaymentsListData", res);
         commit("setDataLoaded", true);
+        dispatch("createDiagramData");
       });
     },
     fetchCategoryList({ state, commit }) {
@@ -92,6 +109,24 @@ export default new Vuex.Store({
       }).then((res) => {
         commit("setCategories", res);
         commit("setCategoriesLoaded", true);
+      });
+    },
+    createDiagramData({ state, commit }) {
+      if (state.diagLoaded) {
+        return;
+      }
+      let data = [["Category", "Category payments sum"]];
+      commit("setDiagData", data);
+      state.paymentsList.forEach((payment) => {
+        commit("addDiagData", payment);
+      });
+      commit("setDiagLoaded", true);
+    },
+    updateDiagData({ state, commit }) {
+      let data = [["Category", "Category payments sum"]];
+      commit("setDiagData", data);
+      state.paymentsList.forEach((payment) => {
+        commit("addDiagData", payment);
       });
     },
   },

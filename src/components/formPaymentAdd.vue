@@ -1,30 +1,64 @@
 <template>
-  <form @submit.prevent="submitFunc">
-    <fieldset>
-      <div>
-        <input
-          v-if="!idProp"
-          type="date"
-          placeholder="Payment data"
-          v-model="date"
-        />
-        <input
-          type="number"
-          placeholder="Payment value"
-          v-model.number="value"
-        />
-      </div>
-      <select v-model="category">
-        <option disabled selected value="">Choose your category</option>
-        <option v-for="(option, i) in categoryList" :key="i" :value="option">
-          {{ option }}
-        </option>
-      </select>
-    </fieldset>
+  <v-form @submit.prevent="submitFunc">
+    <v-container>
+      <v-row>
+        <v-col cols="6" v-if="!idProp">
+          <v-menu
+            ref="menu"
+            v-model="menu"
+            :close-on-content-click="true"
+            transition="scale-transition"
+            offset-y
+            max-width="290px"
+            min-width="auto"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                v-model="computedDateFormatted"
+                label="Date"
+                prepend-icon="mdi-calendar"
+                v-on="on"
+                v-bind="attrs"
+                readonly
+                outlined
+              ></v-text-field>
+            </template>
+            <v-date-picker
+              v-model="date"
+              no-title
+              @input="menu = false"
+            ></v-date-picker>
+          </v-menu>
+        </v-col>
+        <v-col :cols="checkCols(idProp)">
+          <v-text-field
+            class="mt-0 pt-0"
+            v-model.number="value"
+            label="Payment value"
+            required
+            outlined
+          ></v-text-field>
+        </v-col>
+        <v-col cols="12">
+          <v-select
+            v-model="category"
+            :items="categoryList"
+            label="Choose tour category"
+            outlined
+          ></v-select>
+        </v-col>
+      </v-row>
+    </v-container>
     <br />
-    <button v-if="idProp" class="btn">Save</button>
-    <button v-else class="btn">Add cost <span>+</span></button>
-  </form>
+    <v-btn v-if="idProp" type="submit" color="primary" large dark>
+      <span class="mr-1">Save</span>
+      <v-icon>mdi-content-save-outline</v-icon>
+    </v-btn>
+    <v-btn v-else type="submit" color="primary" large dark>
+      <span class="mr-1">Add cost</span>
+      <v-icon>mdi-plus</v-icon>
+    </v-btn>
+  </v-form>
 </template>
 
 <script>
@@ -43,10 +77,23 @@ export default {
       date: null,
       submitFunc: this.addPaymentData,
       idProp: null,
+      menu: false,
     };
+  },
+  watch: {
+    payment: {
+      handler: function (newVal, oldVal) {
+        console.log(newVal, oldVal);
+        this.setNewDataAndDoAction();
+      },
+      deep: true,
+    },
   },
   computed: {
     ...mapGetters(["getCategoryList", "getDataLoaded", "getCategoriesLoaded"]),
+    computedDateFormatted() {
+      return this.convertDate(this.date);
+    },
     categoryList() {
       return this.getCategoryList;
     },
@@ -70,7 +117,7 @@ export default {
     },
   },
   methods: {
-    ...mapMutations(["addDataToPaymentsList", "setPaymentData"]),
+    ...mapMutations(["addDataToPaymentsList", "setPaymentData", "addDiagData"]),
     convertDate(date) {
       if (date) {
         let dateArr = date.split("-");
@@ -81,6 +128,12 @@ export default {
       }
       return this.getCurrentDate;
     },
+    checkCols(id) {
+      if (id) {
+        return 12;
+      }
+      return 6;
+    },
     addPaymentData() {
       const data = {
         date: this.convertDate(this.date),
@@ -88,6 +141,17 @@ export default {
         value: this.value,
       };
       this.addDataToPaymentsList(data);
+      this.addDiagData(data);
+    },
+    setNewDataAndDoAction() {
+      this.category = this.payment.category;
+      this.value = this.payment.value;
+      if (this.payment?.id) {
+        this.submitFunc = this.editPayment;
+        this.idProp = this.payment.id;
+        return;
+      }
+      this.addPaymentData();
     },
     editPayment() {
       const paymentData = {
@@ -96,6 +160,7 @@ export default {
         value: this.value,
       };
       this.setPaymentData(paymentData);
+      this.$store.dispatch("updateDiagData");
     },
   },
   async created() {
@@ -106,72 +171,14 @@ export default {
       await this.$store.dispatch("fetchCategoryList");
     }
     if (this.payment) {
-      this.category = this.payment.category;
-      this.value = this.payment.value;
-      if (this.payment?.id) {
-        this.submitFunc = this.editPayment;
-        this.idProp = this.payment.id;
-        return;
-      }
-      this.addPaymentData();
+      await this.setNewDataAndDoAction();
     }
-  },
-  mounted() {
-    console.log(this.payment);
   },
 };
 </script>
 <style scoped lang="scss">
 form {
-  max-width: 384px;
+  max-width: 400px;
   text-align: right;
-  div {
-    display: flex;
-    margin-bottom: 10px;
-  }
-  fieldset {
-    border-color: #ffffff;
-    padding: 0;
-    border: 0;
-    margin: 0;
-    legend {
-      font-size: 12px;
-    }
-  }
-}
-input {
-  box-sizing: border-box;
-  display: block;
-  width: 100%;
-  padding: 0.375rem 0.75rem;
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 1.5;
-  color: #212529;
-  background-color: #fff;
-  background-clip: padding-box;
-  border: 1px solid #ced4da;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  border-radius: 0.25rem;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-  & + input {
-    margin-left: 10px;
-  }
-}
-select {
-  display: block;
-  width: 100%;
-  padding: 0.594rem 0.75rem;
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 1.5;
-  color: #212529;
-  background-color: #fff;
-  background-clip: padding-box;
-  border: 1px solid #ced4da;
-  border-radius: 0.25rem;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 </style>

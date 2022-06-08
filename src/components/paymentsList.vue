@@ -1,45 +1,89 @@
 <template>
-  <div class="payments">
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Date</th>
-          <th>Category</th>
-          <th>Value</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(payment, i) in payments" :key="i">
-          <td>{{ elNumber + i + 1 }}</td>
-          <td>{{ payment.date }}</td>
-          <td>{{ payment.category }}</td>
-          <td>{{ payment.value }}</td>
-          <td>
-            <svg
-              @click="onMenuOpen($event, payment, elNumber + i + 1)"
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"
-              />
-            </svg>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <v-layout column>
+    <v-simple-table class="mb-6">
+      <template v-slot:default>
+        <thead>
+          <tr>
+            <th class="text-center">#</th>
+            <th class="text-center">Date</th>
+            <th class="text-center">Category</th>
+            <th class="text-center">Value</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(payment, i) in payments" :key="i">
+            <td>{{ elNumber + i + 1 }}</td>
+            <td>{{ payment.date }}</td>
+            <td>{{ payment.category }}</td>
+            <td>{{ payment.value }}</td>
+            <td>
+              <v-menu bottom right>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn icon v-bind="attrs" v-on="on">
+                    <v-icon>mdi-dots-vertical</v-icon>
+                  </v-btn>
+                </template>
+                <v-list>
+                  <v-list-item
+                    :data-id="elNumber + i + 1"
+                    dense
+                    v-for="(item, j) in items"
+                    :key="j"
+                    @click="item.action(payment, elNumber + i + 1)"
+                  >
+                    <v-list-item-title class="text-body-2 font-weight-light">{{
+                      item.title
+                    }}</v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+            </td>
+          </tr>
+        </tbody>
+      </template>
+    </v-simple-table>
     <p>Total: {{ getFPV }}</p>
-  </div>
+    <v-dialog v-model="dialog" max-width="385px">
+      <v-card>
+        <v-card-title class="text-h4 mb-4 font-weight-light">
+          <span>Edit payment</span>
+          <v-spacer></v-spacer>
+          <v-btn light icon @click="dialog = false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
+        <v-card-text>
+          <formPaymentAdd :payment="payment" />
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+  </v-layout>
 </template>
 
 <script>
 import { mapGetters, mapMutations } from "vuex";
 export default {
   name: "paymentsList",
+  components: {
+    formPaymentAdd: () => import("@/components/formPaymentAdd.vue"),
+  },
+  data() {
+    return {
+      payment: {},
+      dialog: false,
+      items: [
+        {
+          title: "Edit",
+          action: this.editItem,
+        },
+        {
+          title: "Remove",
+          action: this.deleteItem,
+        },
+      ],
+    };
+  },
   props: {
     payments: {
       type: Array,
@@ -66,38 +110,16 @@ export default {
   },
   methods: {
     ...mapMutations(["removeDataFromPaymentsList"]),
-    onMenuOpen(event, payment, id) {
+    editItem(item, id) {
       if (id) {
-        payment.id = id;
+        item.id = id;
       }
-      const items = [
-        {
-          text: "Edit",
-          action: () => {
-            this.editItem(payment);
-          },
-        },
-        {
-          text: "Remove",
-          action: () => {
-            this.deleteItem(payment);
-          },
-        },
-      ];
-      this.$dropdownMenu.open({ event, items });
-    },
-    editItem(item) {
-      this.$modal.show("editpayment", {
-        title: "Edit payment",
-        component: "formPaymentAdd",
-        props: {
-          item,
-        },
-      });
+      this.payment = Object.assign({}, item);
+      this.dialog = true;
     },
     deleteItem(payment) {
       this.removeDataFromPaymentsList(payment);
-      this.$dropdownMenu.close();
+      this.$store.dispatch("updateDiagData");
     },
   },
 };

@@ -1,11 +1,16 @@
 <template>
-  <form @submit.prevent="addCategoryData">
-    <fieldset>
-      <input type="text" v-model="category" placeholder="New category name" />
-    </fieldset>
-    <br />
-    <button class="btn">Add category <span>+</span></button>
-  </form>
+  <v-form @submit.prevent="addCategoryData">
+    <v-text-field
+      v-model="category"
+      label="New category name"
+      required
+      outlined
+    ></v-text-field>
+    <v-btn color="primary" type="submit" large dark>
+      <span class="mr-1">Add category</span>
+      <v-icon>mdi-plus</v-icon>
+    </v-btn>
+  </v-form>
 </template>
 
 <script>
@@ -51,53 +56,5 @@ export default {
 form {
   max-width: 384px;
   text-align: right;
-  div {
-    display: flex;
-    margin-bottom: 10px;
-  }
-  fieldset {
-    border-color: #ffffff;
-    border: 0;
-    padding: 0;
-    margin: 0;
-    legend {
-      font-size: 12px;
-    }
-  }
-}
-input {
-  box-sizing: border-box;
-  display: block;
-  width: 100%;
-  padding: 0.375rem 0.75rem;
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 1.5;
-  color: #212529;
-  background-color: #fff;
-  background-clip: padding-box;
-  border: 1px solid #ced4da;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  border-radius: 0.25rem;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-  & + input {
-    margin-left: 10px;
-  }
-}
-select {
-  display: block;
-  width: 100%;
-  padding: 0.594rem 0.75rem;
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 1.5;
-  color: #212529;
-  background-color: #fff;
-  background-clip: padding-box;
-  border: 1px solid #ced4da;
-  border-radius: 0.25rem;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 </style>

@@ -1,162 +1,150 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
+  <v-container>
+    <v-row class="text-center">
+      <v-col cols="12">
+        <v-img
+          :src="require('../assets/logo.svg')"
+          class="my-3"
+          contain
+          height="200"
+        />
+      </v-col>
 
-    <hr>
+      <v-col class="mb-4">
+        <h1 class="display-2 font-weight-bold mb-3">
+          Welcome to Vuetify
+        </h1>
 
-    <input type="number" v-model.number.lazy="operand1" ref="input1" />
-    <input type="number"  v-model.number.lazy="operand2" ref="input2" />
-    <p v-if="result == Infinity">На ноль делить нельзя</p>
-    <p v-else>= {{ result }}</p>
-    <br>
-    <button class ="btn__calc" @click="sum()">+</button>
-    <button class ="btn__calc" @click="substract()">-</button>
-    <button class ="btn__calc" @click="multiply()">*</button>
-    <button class ="btn__calc" @click="degree()">**</button>
-    <button class ="btn__calc" @click="divide()">/</button>
-    <button class ="btn__calc" @click="remainder()">%</button>
-    <button class ="btn__calc" @click="removebutton()">R</button>
+        <p class="subheading font-weight-regular">
+          For help and collaboration with other Vuetify developers,
+          <br>please join our online
+          <a
+            href="https://community.vuetifyjs.com"
+            target="_blank"
+          >Discord Community</a>
+        </p>
+      </v-col>
 
-    <hr>
+      <v-col
+        class="mb-5"
+        cols="12"
+      >
+        <h2 class="headline font-weight-bold mb-3">
+          What's next?
+        </h2>
 
-    <div class="test">
-          <input type="checkbox" id="checkbox" v-model="checked" />Отобразить клавиатуру
-          <div v-if="checked == true">
-            <div class="btn__wrp">
-          <button class="btn" @click="input(num)" v-for="num in numbers" :key="num">{{ num }}</button>
-          </div>
-        </div>
-    </div>
-    
-    <input @click="foc1()" type="radio" name="test" value="operand1" v-model="picked" />Операнд 1
-    <input @click="foc2()" type="radio" name="test" value="operand2" v-model="picked" />Операнд 2
-  </div>
+        <v-row justify="center">
+          <a
+            v-for="(next, i) in whatsNext"
+            :key="i"
+            :href="next.href"
+            class="subheading mx-3"
+            target="_blank"
+          >
+            {{ next.text }}
+          </a>
+        </v-row>
+      </v-col>
+
+      <v-col
+        class="mb-5"
+        cols="12"
+      >
+        <h2 class="headline font-weight-bold mb-3">
+          Important Links
+        </h2>
+
+        <v-row justify="center">
+          <a
+            v-for="(link, i) in importantLinks"
+            :key="i"
+            :href="link.href"
+            class="subheading mx-3"
+            target="_blank"
+          >
+            {{ link.text }}
+          </a>
+        </v-row>
+      </v-col>
+
+      <v-col
+        class="mb-5"
+        cols="12"
+      >
+        <h2 class="headline font-weight-bold mb-3">
+          Ecosystem
+        </h2>
+
+        <v-row justify="center">
+          <a
+            v-for="(eco, i) in ecosystem"
+            :key="i"
+            :href="eco.href"
+            class="subheading mx-3"
+            target="_blank"
+          >
+            {{ eco.text }}
+          </a>
+        </v-row>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
-
-
 <script>
-export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
-  },
-  data() {
-    return {
-      result: '',
-      operand1: '',
-      operand2: '',
-      checked: true,
-      numbers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
-      operands: ["+", "-", "/", "*","**", "%","<--"],
-      picked:[],
-    };
-  },
-  methods: {
-    input(test) {
-      if(this.picked === "operand1"){
-        this.operand1 += parseInt(test)
-      }else{
-        this.operand2 += parseInt(test)
-      }
-    },
-    removebutton() {
-      if(this.operand1.length>1) {
-        this.operand1 = this.operand1.slice(0,this.operand1.length-1)
-      }else{
-        this.operand1=''
-      }
-      if(this.operand2.length>1) {
-        this.operand2 = this.operand2.slice(0,this.operand2.length-1)
-      }else{
-        this.operand2=''
-      }
-    },
-    calculate(operation) {
-      this.error = "";
-      switch (operation) {
-        case "+":
-          this.sum();
-          break;
-        case "-":
-          this.substract();
-          break;
-        case "*":
-          this.multiply();
-          break;
-        case "**":
-          this.degree();
-          break;
-        case "/":
-          this.divide();
-          break;
-        case "%":
-          this.remainder();
-          break;
-        case "<--":
-          this.removebutton();
-          break;
-      }
-    },
-    
-    foc1() {
-        this.$refs.input1.focus();
-    },
-    foc2() {
-        this.$refs.input2.focus();
-    },
-    sum(){
-      this.result = Number(this.operand1) + Number(this.operand2)
-    },
-    substract() {
-      this.result = this.operand1-this.operand2
-    },
-    divide() {
-      this.result = this.operand1 / this.operand2
-    },
-    multiply() {
-      this.result = this.operand1 * this.operand2
-    },
-    degree() {
-      this.result = this.operand1 ** this.operand2
-    },
-    remainder(){
-      this.result = this.operand1 % this.operand2
-  },
-  },
-};
+  export default {
+    name: 'HelloWorld',
+    data: () => ({
+      ecosystem: [
+        {
+          text: 'vuetify-loader',
+          href: 'https://github.com/vuetifyjs/vuetify-loader',
+        },
+        {
+          text: 'github',
+          href: 'https://github.com/vuetifyjs/vuetify',
+        },
+        {
+          text: 'awesome-vuetify',
+          href: 'https://github.com/vuetifyjs/awesome-vuetify',
+        },
+      ],
+      importantLinks: [
+        {
+          text: 'Documentation',
+          href: 'https://vuetifyjs.com',
+        },
+        {
+          text: 'Chat',
+          href: 'https://community.vuetifyjs.com',
+        },
+        {
+          text: 'Made with Vuetify',
+          href: 'https://madewithvuejs.com/vuetify',
+        },
+        {
+          text: 'Twitter',
+          href: 'https://twitter.com/vuetifyjs',
+        },
+        {
+          text: 'Articles',
+          href: 'https://medium.com/vuetify',
+        },
+      ],
+      whatsNext: [
+        {
+          text: 'Explore components',
+          href: 'https://vuetifyjs.com/components/api-explorer',
+        },
+        {
+          text: 'Select a layout',
+          href: 'https://vuetifyjs.com/getting-started/pre-made-layouts',
+        },
+        {
+          text: 'Frequently Asked Questions',
+          href: 'https://vuetifyjs.com/getting-started/frequently-asked-questions',
+        },
+      ],
+    }),
+  }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="scss">
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-.btn__wrp {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  width: 100px;
-  margin: 0 auto;
-}
-.btn {
-  width: 50px;
-  height: 50px;
-}
-.btn__calc {
-  width: 30px;
-  height: 30px;
-  margin: 3px;
-}
-</style>

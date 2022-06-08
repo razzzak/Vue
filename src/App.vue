@@ -1,51 +1,26 @@
 <template>
-  <div id="app">
-    <nav>
-      <router-link to="/">Dashboard</router-link> |
-      <router-link to="/about">About</router-link>
-    </nav>
-    <router-view />
-    <transition name="fade">
-      <ModalWindow :settings="settings" v-if="modalShow" />
-    </transition>
-    <transition name="fade">
-      <DropdownMenu />
-    </transition>
-  </div>
-</template>
-<script>
-export default {
-  data() {
-    return {
-      modalShow: false,
-      settings: {},
-    };
-  },
-  components: {
-    ModalWindow: () => import("@/components/ModalWindow.vue"),
-    DropdownMenu: () => import("@/components/DropdownMenuTemplate.vue"),
-  },
-  methods: {
-    onShow(data) {
-      this.modalShow = true;
-      this.settings = data;
-    },
-    onHide() {
-      this.modalShow = false;
-      this.settings = {};
-    },
-  },
-  mounted() {
-    this.$modal.EventBus.$on("show", this.onShow);
-    this.$modal.EventBus.$on("hide", this.onHide);
-  },
-  beforeDestroy() {
-    this.$modal.EventBus.$off("show", this.onShow);
-    this.$modal.EventBus.$off("hide", this.onHide);
-  },
-};
-</script>
+  <v-app>
+    <v-app-bar app flat>
+      <div class="d-flex align-center">
+        <v-img
+          alt="Vuetify Logo"
+          class="shrink mr-2"
+          contain
+          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
+          transition="scale-transition"
+          width="40"
+        />
+      </div>
+      <v-spacer></v-spacer>
+      <v-btn plain :ripple="false" class="mr-3" to="/" text> Dashboard </v-btn>
+      <v-btn plain :ripple="false" to="/about" text> About </v-btn>
+    </v-app-bar>
 
+    <v-main>
+      <router-view />
+    </v-main>
+  </v-app>
+</template>
 <style lang="scss">
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;

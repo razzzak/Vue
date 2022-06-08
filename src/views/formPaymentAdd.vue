@@ -1,7 +1,9 @@
 <template>
   <div class="payment-add">
     <div>
-      <h1 class="title">Add new payment in {{ $route.params.category }}</h1>
+      <h1 class="text-h2 text-left mb-12 mt-8">
+        Add new payment in {{ $route.params.category }}
+      </h1>
       <formPaymentAdd :payment="payment" />
     </div>
   </div>

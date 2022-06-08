@@ -1,16 +1,10 @@
 <template>
-  <div :class="[$style.wrp]">
-    <div @click="onClick(current - 1)">-</div>
-    <div
-      v-for="i in amount"
-      :key="i"
-      :class="{ [$style.active]: current === i }"
-      @click="onClick(i)"
-    >
-      {{ i }}
-    </div>
-    <div @click="onClick(current + 1)">+</div>
-  </div>
+  <v-pagination
+    :value="current"
+    :length="amount"
+    :total-visible="6"
+    @input="onClick($event)"
+  ></v-pagination>
 </template>
 
 <script>
@@ -27,32 +21,9 @@ export default {
     },
   },
   methods: {
-    onClick(p) {
-      if (p < 1 || p > this.amount) {
-        return;
-      }
-      this.$emit("changePage", p);
+    onClick(e) {
+      this.$emit("changePage", e);
     },
-  },
-  beforeUpdate() {
-    if (this.amount < this.current) {
-      this.onClick(this.current - 1);
-    }
   },
 };
 </script>
-
-<style module lang="scss">
-.wrp {
-  display: flex;
-  & > div {
-    padding: 10px;
-    &:not(.active) {
-      cursor: pointer;
-    }
-    &.active {
-      background: #ccc;
-    }
-  }
-}
-</style>
