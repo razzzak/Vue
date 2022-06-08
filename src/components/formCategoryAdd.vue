@@ -1,7 +1,6 @@
 <template>
   <form @submit.prevent="addCategoryData">
     <fieldset>
-      <legend>Add new category</legend>
       <input type="text" v-model="category" placeholder="New category name" />
     </fieldset>
     <br />
@@ -58,9 +57,9 @@ form {
   }
   fieldset {
     border-color: #ffffff;
-    border-style: solid;
-    border-width: 1px;
-    box-shadow: 0px 0px 15px rgba(222, 222, 222, 0.5);
+    border: 0;
+    padding: 0;
+    margin: 0;
     legend {
       font-size: 12px;
     }

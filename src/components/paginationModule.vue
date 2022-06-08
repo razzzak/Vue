@@ -34,6 +34,11 @@ export default {
       this.$emit("changePage", p);
     },
   },
+  beforeUpdate() {
+    if (this.amount < this.current) {
+      this.onClick(this.current - 1);
+    }
+  },
 };
 </script>
 
@@ -42,6 +47,9 @@ export default {
   display: flex;
   & > div {
     padding: 10px;
+    &:not(.active) {
+      cursor: pointer;
+    }
     &.active {
       background: #ccc;
     }

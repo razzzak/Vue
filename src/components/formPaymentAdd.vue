@@ -1,9 +1,13 @@
 <template>
-  <form @submit.prevent="addPaymentData">
+  <form @submit.prevent="submitFunc">
     <fieldset>
-      <legend>Add new cost</legend>
       <div>
-        <input type="date" placeholder="Payment data" v-model="date" />
+        <input
+          v-if="!idProp"
+          type="date"
+          placeholder="Payment data"
+          v-model="date"
+        />
         <input
           type="number"
           placeholder="Payment value"
@@ -11,14 +15,15 @@
         />
       </div>
       <select v-model="category">
-        <option disabled selected value="">Выберите категорию</option>
+        <option disabled selected value="">Choose your category</option>
         <option v-for="(option, i) in categoryList" :key="i" :value="option">
           {{ option }}
         </option>
       </select>
     </fieldset>
     <br />
-    <button class="btn">Add cost <span>+</span></button>
+    <button v-if="idProp" class="btn">Save</button>
+    <button v-else class="btn">Add cost <span>+</span></button>
   </form>
 </template>
 
@@ -27,13 +32,8 @@ import { mapMutations, mapGetters } from "vuex";
 export default {
   name: "formPaymentAdd",
   props: {
-    categoryProp: {
-      type: String,
-      default: () => "",
-    },
-    valueProp: {
-      type: Number,
-      default: () => null,
+    payment: {
+      type: Object,
     },
   },
   data() {
@@ -41,6 +41,8 @@ export default {
       category: "",
       value: null,
       date: null,
+      submitFunc: this.addPaymentData,
+      idProp: null,
     };
   },
   computed: {
@@ -68,7 +70,7 @@ export default {
     },
   },
   methods: {
-    ...mapMutations(["addDataToPaymentsList"]),
+    ...mapMutations(["addDataToPaymentsList", "setPaymentData"]),
     convertDate(date) {
       if (date) {
         let dateArr = date.split("-");
@@ -87,6 +89,14 @@ export default {
       };
       this.addDataToPaymentsList(data);
     },
+    editPayment() {
+      const paymentData = {
+        id: +this.idProp,
+        category: this.category,
+        value: this.value,
+      };
+      this.setPaymentData(paymentData);
+    },
   },
   async created() {
     if (!this.paymentsLoaded) {
@@ -95,19 +105,22 @@ export default {
     if (!this.categoriesLoaded) {
       await this.$store.dispatch("fetchCategoryList");
     }
-    if (this.categoryProp) {
-      this.category = this.categoryProp;
-    }
-    if (this.valueProp) {
-      this.value = this.valueProp;
-    }
-    if (this.categoryProp && this.valueProp) {
+    if (this.payment) {
+      this.category = this.payment.category;
+      this.value = this.payment.value;
+      if (this.payment?.id) {
+        this.submitFunc = this.editPayment;
+        this.idProp = this.payment.id;
+        return;
+      }
       this.addPaymentData();
     }
   },
+  mounted() {
+    console.log(this.payment);
+  },
 };
 </script>
-
 <style scoped lang="scss">
 form {
   max-width: 384px;
@@ -118,9 +131,9 @@ form {
   }
   fieldset {
     border-color: #ffffff;
-    border-style: solid;
-    border-width: 1px;
-    box-shadow: 0px 0px 15px rgba(222, 222, 222, 0.5);
+    padding: 0;
+    border: 0;
+    margin: 0;
     legend {
       font-size: 12px;
     }
